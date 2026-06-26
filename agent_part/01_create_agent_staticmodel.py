@@ -61,14 +61,17 @@ def search_news(company: str) -> str:
 
 
 # 2. 创建 Agent ,调用工具
-# 创建一个agent，LLM就会根据这个agent，调用对应的工具。不用像前两个demo那样，需要看一下LLM决定要调用哪个工具，然后再手动调用工具，再把结果拼到messages中, 再把完全的 messages 给到大模型，让大模型返回最终的结果。
 agent = create_agent(
     model=deepseek_llm,
     tools=[get_stock_price, search_news],
 )
 
-# 这个就是一个标准的 invoke 参数写法。就记得这一种就好了。
-resp = agent.invoke({"messages": [{"role": "user", "content": "苹果公司上周股价是多少？有什么新闻？"}]})
+# 用户把问题提交给LLM，LLM就会根据判断需要调用多少个工具，然后就把各个工具的信息都拿到，再根据工具返回的消息，再总结给回用户。
+
+resp = agent.invoke({"messages": [
+    {"role": "user", "content": "苹果公司上周股价是多少？有什么新闻？"},
+    {"role": "assistant", "content": "苹果公司上周股价是183.50美元。苹果发布新款iPhone，股价上涨3%。苹果与欧盟达成反垄断和解协议。苹果将在印度扩大生产规模。"},
+]})
 print(type(resp))
 print(resp)
 
